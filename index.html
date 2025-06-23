@@ -1,14 +1,14 @@
-<!DOCTYPE html>
+when<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Trap the Bunny</title>
+  <title>Animal Arcade</title>
   <style>
     body {
       font-family: 'Quicksand', 'Nunito', 'Comic Sans MS', cursive, sans-serif;
       margin: 0;
-      background: linear-gradient(135deg, #d0f5d8 0%, #b8e6c1 100%);
+      background: linear-gradient(135deg, #d0f5d8 0%, #b3e5fc 100%);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -25,6 +25,8 @@
       width: 100vw;
       position: relative;
       z-index: 1;
+      background: linear-gradient(120deg, #e1f5fe 0%, #d0f5d8 100%);
+      box-shadow: 0 0 0 100vmax #e1f5fe33 inset;
     }
     .flower {
       display: flex;
@@ -50,6 +52,8 @@
       min-width: 340px;
       position: relative;
       z-index: 2;
+      /* Add a soft border for both games */
+      border: 2.5px solid #b3e5fc;
     }
     .bunny-ears {
       position: absolute;
@@ -60,16 +64,49 @@
       z-index: 3;
       pointer-events: none;
       user-select: none;
+      filter: drop-shadow(0 2px 8px #b3e5fc);
     }
-    .carrot {
+    .owl-ears {
       position: absolute;
-      bottom: -30px;
+      top: -38px;
       left: 50%;
-      transform: translateX(-50%) rotate(-10deg);
-      font-size: 2em;
+      transform: translateX(-50%);
+      font-size: 2.5em;
       z-index: 3;
       pointer-events: none;
       user-select: none;
+      filter: drop-shadow(0 2px 8px #b3e5fc);
+    }
+    .axolotl-ears {
+      position: absolute;
+      top: -38px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 2.5em;
+      z-index: 3;
+      pointer-events: none;
+      user-select: none;
+      filter: drop-shadow(0 2px 8px #f8bbd0);
+    }
+    .puppy-ears {
+      position: absolute;
+      top: -38px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 2.5em;
+      z-index: 3;
+      pointer-events: none;
+      user-select: none;
+      filter: drop-shadow(0 2px 8px #bdbdbd);
+    }
+    .maze-owner {
+      font-size: 2em;
+      filter: drop-shadow(0 2px 8px #bdbdbd);
+    }
+    .maze-puppy {
+      font-size: 1.7em;
+      filter: drop-shadow(0 2px 8px #bdbdbd);
+      color: #ffb300;
     }
     .cloud {
       position: absolute;
@@ -204,140 +241,479 @@
   </style>
 </head>
 <body>
-  <div class="main-wrapper">
-    <div class="flower" aria-hidden="true">
-      🌸<br>🌼<br>🌷<br>🌻
-    </div>
-    <div style="display: flex; flex-direction: column; align-items: center; position: relative;">
-      <div class="bunny-ears" aria-hidden="true">🐰</div>
-      <div class="container" id="start-container">
-        <h1>Trap the Bunny</h1>
-        <div id="instructions">
-          <h2>How to Play</h2>
-          <ul>
-            <li>The bunny 🐰 starts in the middle of the grid.</li>
-            <li>Click circles to block them and try to trap the bunny.</li>
-            <li>After each block, the bunny moves one step toward the edge.</li>
-            <li>If the bunny escapes to the edge, you lose.</li>
-            <li>If you block all escape routes, you win!</li>
-          </ul>
-          <button id="start-btn">Start Game</button>
+    <div class="main-wrapper" id="landing-wrapper">
+      <div class="flower" aria-hidden="true">🌸<br>🌼<br>🌷<br>🌻</div>
+      <div style="display: flex; flex-direction: column; align-items: center; position: relative;">
+        <div class="bunny-ears" aria-hidden="true">🐰</div>
+        <div class="container" id="landing-container">
+          <h1>Welcome!</h1>
+          <h2>Choose a Game</h2>
+          <div style="display: flex; gap: 32px; margin: 24px 0;">
+            <button id="choose-bunny" style="font-size:1.2em;">🐰 Trap the Bunny</button>
+            <button id="choose-owl" style="font-size:1.2em;">🦉 Flappy Owl</button>
+            <button id="choose-fish" style="font-size:1.2em;">🐟 Fish Game</button>
+          </div>
         </div>
       </div>
-      <div class="container" id="game-container" style="display:none">
-        <h1>Trap the Bunny</h1>
-        <div id="game"></div>
-        <div id="status" class="status"></div>
-        <button id="restart">Restart</button>
-        <p>Click circles to block the bunny. Trap it before it escapes!</p>
-        <div class="carrot" aria-hidden="true">🥕</div>
+      <div class="flower" aria-hidden="true">🌻<br>🌷<br>🌼<br>🌸</div>
+      <div class="cloud left" aria-hidden="true">☁️</div>
+      <div class="cloud right" aria-hidden="true">☁️</div>
+      <div class="cloud center" aria-hidden="true">☁️</div>
+      <div class="butterfly left" aria-hidden="true">🦋</div>
+      <div class="butterfly right" aria-hidden="true">🦋</div>
+    </div>
+    <div class="main-wrapper" id="bunny-wrapper" style="display:none">
+      <div class="flower" aria-hidden="true">
+        🌸<br>🌼<br>🌷<br>🌻
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center; position: relative;">
+        <div class="bunny-ears" aria-hidden="true">🐰</div>
+        <div class="container" id="start-container">
+          <h1>Trap the Bunny</h1>
+          <div id="instructions">
+            <h2>How to Play</h2>
+            <ul>
+              <li>The bunny 🐰 starts in the middle of the grid.</li>
+              <li>Click circles to block them and try to trap the bunny.</li>
+              <li>After each block, the bunny moves one step toward the edge.</li>
+              <li>If the bunny escapes to the edge, you lose.</li>
+              <li>If you block all escape routes, you win!</li>
+            </ul>
+            <button id="start-btn">Start Game</button>
+          </div>
+        </div>
+        <div class="container" id="game-container" style="display:none">
+          <h1>Trap the Bunny</h1>
+          <div id="game"></div>
+          <div id="status" class="status"></div>
+          <button id="restart">Restart</button>
+          <p>Click circles to block the bunny. Trap it before it escapes!</p>
+          <div class="carrot" aria-hidden="true">🥕</div>
+        </div>
+      </div>
+      <div class="flower" aria-hidden="true">
+        🌻<br>🌷<br>🌼<br>🌸
+      </div>
+      <div class="cloud left" aria-hidden="true">
+        ☁️
+      </div>
+      <div class="cloud right" aria-hidden="true">
+        ☁️
+      </div>
+      <div class="cloud center" aria-hidden="true">
+        ☁️
+      </div>
+      <div class="butterfly left" aria-hidden="true">
+        🦋
+      </div>
+      <div class="butterfly right" aria-hidden="true">
+        🦋
       </div>
     </div>
-    <div class="flower" aria-hidden="true">
-      🌻<br>🌷<br>🌼<br>🌸
+    <div class="main-wrapper" id="owl-wrapper" style="display:none">
+      <div class="flower" aria-hidden="true">🌸<br>🌼<br>🌷<br>🌻</div>
+      <div style="display: flex; flex-direction: column; align-items: center; position: relative;">
+        <div class="bunny-ears" aria-hidden="true">🦉</div>
+        <div class="owl-ears" aria-hidden="true">🦉</div>
+        <div class="container" id="owl-instructions">
+          <h1>Flappy Owl</h1>
+          <h2>How to Play</h2>
+          <ul>
+            <li>Click or press space to make the owl flap up.</li>
+            <li>Collect as many coins as you can!</li>
+            <li>If the owl falls to the ground, the game is over.</li>
+          </ul>
+          <button id="start-owl">Start Game</button>
+        </div>
+        <div class="container" id="owl-game-container" style="display:none">
+          <h1>Flappy Owl</h1>
+          <div id="owl-game"></div>
+          <div id="owl-status" class="status"></div>
+          <button id="restart-owl">Restart</button>
+        </div>
+      </div>
+      <div class="flower" aria-hidden="true">🌻<br>🌷<br>🌼<br>🌸</div>
     </div>
-    <div class="cloud left" aria-hidden="true">
-      ☁️
-    </div>
-    <div class="cloud right" aria-hidden="true">
-      ☁️
-    </div>
-    <div class="cloud center" aria-hidden="true">
-      ☁️
-    </div>
-    <div class="butterfly left" aria-hidden="true">
-      🦋
-    </div>
-    <div class="butterfly right" aria-hidden="true">
-      🦋
-    </div>
-  </div>
-  <script>
-    const GRID_SIZE = 9;
-    const CENTER = Math.floor(GRID_SIZE / 2);
-    let blocked = new Set();
-    let bunny = [CENTER, CENTER];
-    let status = "";
 
-    function getNeighbors([x, y]) {
-      return [
-        [x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1],
-        [x - 1, y - 1], [x - 1, y + 1], [x + 1, y - 1], [x + 1, y + 1],
-      ].filter(([nx, ny]) => nx >= 0 && nx < GRID_SIZE && ny >= 0 && ny < GRID_SIZE);
-    }
-    function isEdge([x, y]) {
-      return x === 0 || y === 0 || x === GRID_SIZE - 1 || y === GRID_SIZE - 1;
-    }
-    function bfs(bunny, blocked) {
-      const queue = [[bunny, [bunny]]];
-      const visited = new Set([bunny.toString()]);
-      while (queue.length) {
-        const [pos, path] = queue.shift();
-        if (isEdge(pos)) return path;
-        for (const n of getNeighbors(pos)) {
-          if (!blocked.has(n.toString()) && !visited.has(n.toString())) {
-            visited.add(n.toString());
-            queue.push([n, [...path, n]]);
+    <!-- Fish Game Wrapper -->
+    <div class="main-wrapper" id="fish-wrapper" style="display:none">
+      <div class="flower" aria-hidden="true">🌸<br>🌼<br>🌷<br>🌻</div>
+      <div style="display: flex; flex-direction: column; align-items: center; position: relative;">
+        <div class="bunny-ears" aria-hidden="true">🐟</div>
+        <div class="container" id="fish-instructions">
+          <h1>Fish Game</h1>
+          <h2>How to Play</h2>
+          <ul>
+            <li>Control the fish 🐟 using the arrow keys (or WASD).</li>
+            <li>Eat the food 🥕 to grow longer.</li>
+            <li>Don't bump into the walls or your own tail!</li>
+            <li>Each food you eat increases your score and the fish's length.</li>
+            <li>Try to get the highest score possible!</li>
+          </ul>
+          <button id="start-fish">Start Game</button>
+        </div>
+        <div class="container" id="fish-game-container" style="display:none">
+          <h1>Fish Game</h1>
+          <div id="fish-game"></div>
+          <div id="fish-status" class="status"></div>
+          <button id="restart-fish">Restart</button>
+          <p>Eat food to grow longer. Avoid the walls and yourself!</p>
+        </div>
+      </div>
+      <div class="flower" aria-hidden="true">🌻<br>🌷<br>🌼<br>🌸</div>
+    </div>
+
+    <script>
+      const GRID_SIZE = 9;
+      const CENTER = Math.floor(GRID_SIZE / 2);
+      let blocked = new Set();
+      let bunny = [CENTER, CENTER];
+      let status = "";
+      function getNeighbors([x, y]) {
+        return [
+          [x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1],
+          [x - 1, y - 1], [x - 1, y + 1], [x + 1, y - 1], [x + 1, y + 1],
+        ].filter(([nx, ny]) => nx >= 0 && nx < GRID_SIZE && ny >= 0 && ny < GRID_SIZE);
+      }
+      function isEdge([x, y]) {
+        return x === 0 || y === 0 || x === GRID_SIZE - 1 || y === GRID_SIZE - 1;
+      }
+      function bfs(bunny, blocked) {
+        const queue = [[bunny, [bunny]]];
+        const visited = new Set([bunny.toString()]);
+        while (queue.length) {
+          const [pos, path] = queue.shift();
+          if (isEdge(pos)) return path;
+          for (const n of getNeighbors(pos)) {
+            if (!blocked.has(n.toString()) && !visited.has(n.toString())) {
+              visited.add(n.toString());
+              queue.push([n, [...path, n]]);
+            }
           }
         }
+        return null;
       }
-      return null;
-    }
-    function render() {
-      const game = document.getElementById('game');
-      game.innerHTML = '';
-      for (let x = 0; x < GRID_SIZE; x++) {
-        const row = document.createElement('div');
-        row.className = 'row';
-        for (let y = 0; y < GRID_SIZE; y++) {
-          const cell = document.createElement('div');
-          cell.className = 'cell';
-          const key = [x, y].toString();
-          if (blocked.has(key)) cell.classList.add('blocked');
-          if (bunny[0] === x && bunny[1] === y) {
-            cell.classList.add('bunny');
-            cell.textContent = '🐰';
+      function render() {
+        const game = document.getElementById('game');
+        game.innerHTML = '';
+        for (let x = 0; x < GRID_SIZE; x++) {
+          const row = document.createElement('div');
+          row.className = 'row';
+          for (let y = 0; y < GRID_SIZE; y++) {
+            const cell = document.createElement('div');
+            cell.className = 'cell';
+            const key = [x, y].toString();
+            if (blocked.has(key)) {
+              cell.classList.add('blocked');
+              cell.textContent = '🐺'; // Wolf icon for blocked cells
+            }
+            if (bunny[0] === x && bunny[1] === y) {
+              cell.classList.add('bunny');
+              cell.textContent = '🐰';
+            }
+            cell.addEventListener('click', () => handleCellClick(x, y));
+            row.appendChild(cell);
           }
-          cell.addEventListener('click', () => handleCellClick(x, y));
-          row.appendChild(cell);
+          game.appendChild(row);
         }
-        game.appendChild(row);
+        document.getElementById('status').textContent = status;
       }
-      document.getElementById('status').textContent = status;
-    }
-    function handleCellClick(x, y) {
-      if (status || (bunny[0] === x && bunny[1] === y)) return;
-      const key = [x, y].toString();
-      if (blocked.has(key)) return;
-      blocked.add(key);
-      const path = bfs(bunny, blocked);
-      if (!path) {
-        status = "You win! The bunny is trapped.";
-        render();
-        return;
-      }
-      if (isEdge(path[1])) {
+      function handleCellClick(x, y) {
+        if (status || (bunny[0] === x && bunny[1] === y)) return;
+        const key = [x, y].toString();
+        if (blocked.has(key)) return;
+        blocked.add(key);
+        const path = bfs(bunny, blocked);
+        if (!path) {
+          status = "You win! The bunny is trapped.";
+          render();
+          return;
+        }
+        // If the bunny is surrounded (no valid moves), you win
+        if (getNeighbors(bunny).every(([nx, ny]) => blocked.has([nx, ny].toString()))) {
+          status = "You win! The bunny is trapped.";
+          render();
+          return;
+        }
+        if (isEdge(path[1])) {
+          bunny = path[1];
+          status = "You lose! The bunny escaped.";
+          render();
+          return;
+        }
         bunny = path[1];
-        status = "You lose! The bunny escaped.";
         render();
-        return;
       }
-      bunny = path[1];
-      render();
-    }
-    function resetGame() {
-      blocked = new Set();
-      bunny = [CENTER, CENTER];
-      status = "";
-      render();
-    }
-    function showGame() {
-      document.getElementById('start-container').style.display = 'none';
-      document.getElementById('game-container').style.display = 'flex';
-      resetGame();
-    }
-    document.getElementById('start-btn').onclick = showGame;
-    document.getElementById('restart').onclick = resetGame;
-  </script>
-</body>
+      function getRandomBlocks(numBlocks = 12) {
+        const blocks = new Set();
+        // Always block some cells around the bunny
+        const neighbors = getNeighbors([CENTER, CENTER]);
+        // Randomly pick 4-6 neighbors to block
+        let shuffled = neighbors.sort(() => 0.5 - Math.random());
+        let nBlock = Math.floor(Math.random() * 3) + 4; // 4-6
+        for (let i = 0; i < nBlock; i++) {
+          blocks.add(shuffled[i].toString());
+        }
+        // Add more random blocks elsewhere
+        while (blocks.size < numBlocks) {
+          const x = Math.floor(Math.random() * GRID_SIZE);
+          const y = Math.floor(Math.random() * GRID_SIZE);
+          // Don't block the center or edge
+          if ((x === CENTER && y === CENTER) || x === 0 || y === 0 || x === GRID_SIZE-1 || y === GRID_SIZE-1) continue;
+          blocks.add([x, y].toString());
+        }
+        return Array.from(blocks).map(str => str.split(',').map(Number));
+      }
+      let initialBlocks = getRandomBlocks();
+      function resetGame() {
+        initialBlocks = getRandomBlocks();
+        blocked = new Set(initialBlocks.map(xy => xy.toString()));
+        bunny = [CENTER, CENTER];
+        status = "";
+        render();
+      }
+      function showGame() {
+        document.getElementById('start-container').style.display = 'none';
+        document.getElementById('game-container').style.display = 'flex';
+        resetGame();
+      }
+      document.getElementById('start-btn').onclick = showGame;
+      document.getElementById('restart').onclick = resetGame;
+      // Game selection logic
+      document.getElementById('choose-bunny').onclick = function() {
+        document.getElementById('landing-wrapper').style.display = 'none';
+        document.getElementById('bunny-wrapper').style.display = 'flex';
+      };
+      document.getElementById('choose-owl').onclick = function() {
+        document.getElementById('landing-wrapper').style.display = 'none';
+        document.getElementById('owl-wrapper').style.display = 'flex';
+      };
+      document.getElementById('choose-fish').onclick = function() {
+        document.getElementById('landing-wrapper').style.display = 'none';
+        document.getElementById('fish-wrapper').style.display = 'flex';
+        // Immediately start the game instructions (skip extra click)
+        document.getElementById('fish-instructions').style.display = 'none';
+        document.getElementById('fish-game-container').style.display = 'flex';
+        resetFishGame();
+      };
+
+      // Flappy Owl game logic (sky background, free space, obstacles, coin counter)
+      let owlGame, owl, owlGravity, owlVelocity, owlInterval, coins, score, owlGameOver, pipes;
+      function startOwlGame() {
+        document.getElementById('owl-instructions').style.display = 'none';
+        document.getElementById('owl-game-container').style.display = 'flex';
+        owlGame = document.getElementById('owl-game');
+        document.getElementById('owl-status').textContent = '';
+        score = 0;
+        owlGameOver = false;
+        owl = { x: 60, y: 120 };
+        owlGravity = 0.5;
+        owlVelocity = 0;
+        coins = [{ x: 320, y: Math.floor(Math.random()*180)+30 }];
+        // Make pipe gap larger for easier play
+        pipes = [{ x: 320, gapY: Math.floor(Math.random()*120)+40, gapSize: 100 }];
+        renderOwlGame();
+        owlInterval = setInterval(updateOwlGame, 24);
+        document.addEventListener('keydown', owlFlapHandler);
+        owlGame.onclick = owlFlap;
+      }
+      function owlFlapHandler(e) {
+        if (e.code === 'Space') owlFlap();
+      }
+      function owlFlap() {
+        if (owlGameOver) return;
+        owlVelocity = -6;
+      }
+      function updateOwlGame() {
+        owlVelocity += owlGravity;
+        owl.y += owlVelocity;
+        if (owl.y >= 240) {
+          owl.y = 240;
+          endOwlGame();
+          return;
+        }
+        if (owl.y < 0) owl.y = 0;
+        // Move pipes and coins
+        for (let p of pipes) p.x -= 2.5;
+        for (let c of coins) c.x -= 2.5;
+        // Remove pipes/coins out of view
+        pipes = pipes.filter(p => p.x > -60);
+        coins = coins.filter(c => c.x > -30);
+        // Add new pipes with even larger gap
+        if (pipes.length < 2) {
+          let gapY = Math.floor(Math.random()*120)+40;
+          pipes.push({ x: 320, gapY, gapSize: 120 });
+          coins.push({ x: 320+40, y: gapY+Math.floor(Math.random()*40)-20 });
+        }
+        // Collision with pipes (use gapSize)
+        for (let p of pipes) {
+          if (p.x < owl.x+24 && p.x+40 > owl.x) {
+            if (owl.y < p.gapY-p.gapSize/2 || owl.y > p.gapY+p.gapSize/2) {
+              endOwlGame();
+              return;
+            }
+            // Score for passing obstacle
+            if (!p.passed && p.x+40 < owl.x) {
+              score++;
+              p.passed = true;
+            }
+          }
+        }
+        // Collect coins
+        for (let c of coins) {
+          if (Math.abs(c.x - owl.x) < 24 && Math.abs(c.y - owl.y) < 24) {
+            score++;
+            c.x = -100;
+          }
+        }
+        renderOwlGame();
+      }
+      function renderOwlGame() {
+        let html = `<div style='position:relative;width:320px;height:270px;background:linear-gradient(180deg,#b3e5fc 0%,#e1f5fe 100%);border-radius:18px;box-shadow:0 2px 12px #b8e6c1;'>`;
+        // Pipes with a big gap, from top and bottom
+        for (let p of pipes) {
+          // Top pipe
+          html += `<div style='position:absolute;left:${p.x}px;top:0;width:40px;height:${p.gapY-p.gapSize/2}px;background:#a5d6a7;border-radius:12px 12px 8px 8px;box-shadow:0 2px 8px #b8e6c1;'></div>`;
+          // Bottom pipe
+          html += `<div style='position:absolute;left:${p.x}px;top:${p.gapY+p.gapSize/2}px;width:40px;height:${270-(p.gapY+p.gapSize/2)}px;background:#a5d6a7;border-radius:8px 8px 12px 12px;box-shadow:0 2px 8px #b8e6c1;'></div>`;
+        }
+        // Coins
+        for (let c of coins) {
+          html += `<div style='position:absolute;left:${c.x}px;top:${c.y}px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:22px;'>🪙</div>`;
+        }
+        // Owl
+        html += `<div style='position:absolute;left:${owl.x}px;top:${owl.y}px;width:32px;height:32px;font-size:28px;transition:top 0.1s;'>🦉</div>`;
+        // Score and Level
+        html += `<div style='position:absolute;top:8px;left:0;width:100%;text-align:center;font-size:1.3em;color:#388e3c;font-family:Quicksand,Nunito,cursive;'>Score: ${score} &nbsp; | &nbsp; Level: ${1+Math.floor(score/10)}</div>`;
+        html += `</div>`;
+        owlGame.innerHTML = html;
+      }
+      function endOwlGame() {
+        clearInterval(owlInterval);
+        owlGameOver = true;
+        document.getElementById('owl-status').textContent = `Game Over! Coins collected: ${score}`;
+        document.removeEventListener('keydown', owlFlapHandler);
+        owlGame.onclick = null;
+      }
+      document.getElementById('start-owl').onclick = startOwlGame;
+      document.getElementById('restart-owl').onclick = function() {
+        document.getElementById('owl-game-container').style.display = 'none';
+        document.getElementById('owl-instructions').style.display = 'flex';
+      };
+
+      // Fish Game logic
+      const FISH_SIZE = 16;
+      const FISH_BOX = 15;
+      let fish, fishDir, fishFood, fishScore, fishInterval, fishGameOver, shark = null;
+      let sharkShouldCatch = false;
+
+      function resetFishGame() {
+        fish = [[7, 7]];
+        fishDir = [0, -1];
+        fishScore = 0;
+        fishGameOver = false;
+        placeFishFood();
+        shark = [fish[0][0], fish[0][1] + 3]; // Start shark 3 squares behind
+        sharkShouldCatch = false;
+        renderFishGame();
+        if (fishInterval) clearInterval(fishInterval);
+        fishInterval = setInterval(updateFishGame, 120);
+        document.addEventListener('keydown', fishKeyHandler);
+      }
+
+      function placeFishFood() {
+        let pos;
+        do {
+          pos = [
+            Math.floor(Math.random() * FISH_BOX),
+            Math.floor(Math.random() * FISH_BOX)
+          ];
+        } while (fish.some(([x, y]) => x === pos[0] && y === pos[1]));
+        fishFood = pos;
+      }
+
+      function updateFishGame() {
+        if (fishGameOver) return;
+        const head = [fish[0][0] + fishDir[0], fish[0][1] + fishDir[1]];
+        // Check wall or self collision
+        const hitWall = head[0] < 0 || head[0] >= FISH_BOX || head[1] < 0 || head[1] >= FISH_BOX;
+        const hitSelf = fish.some(([x, y]) => x === head[0] && y === head[1]);
+        if (hitWall || hitSelf) {
+          // On collision, shark catches up to the fish's head
+          fish.unshift(head); // visually show the collision
+          shark = [...head];
+          renderFishGame(true); // pass flag to show shark on head
+          setTimeout(() => {
+            endFishGame(true); // pass flag to show shark caught fish
+          }, 400);
+          return;
+        }
+        fish.unshift(head);
+        if (head[0] === fishFood[0] && head[1] === fishFood[1]) {
+          fishScore++;
+          placeFishFood();
+        } else {
+          fish.pop();
+        }
+        // Shark always stays 3 segments behind (never catches up)
+        if (fish.length > 3) {
+          shark = [...fish[3]];
+        } else {
+          shark = [...fish[fish.length - 1]];
+        }
+        renderFishGame();
+      }
+
+      function renderFishGame(sharkOnHead = false) {
+        let html = `<div style='position:relative;width:${FISH_BOX*FISH_SIZE}px;height:${FISH_BOX*FISH_SIZE}px;background:linear-gradient(135deg,#b3e5fc 0%,#d0f5d8 100%);border-radius:18px;box-shadow:0 2px 12px #b8e6c1;margin-bottom:10px;overflow:hidden;'>`;
+        // Draw checkerboard background
+        for (let x = 0; x < FISH_BOX; x++) {
+          for (let y = 0; y < FISH_BOX; y++) {
+            const isDark = (x + y) % 2 === 0;
+            html += `<div style='position:absolute;left:${x*FISH_SIZE}px;top:${y*FISH_SIZE}px;width:${FISH_SIZE}px;height:${FISH_SIZE}px;background:${isDark ? '#1976d2' : '#b3e5fc'};opacity:0.32;z-index:0;'></div>`;
+          }
+        }
+        // Draw food as shrimp emoji
+        html += `<div style='position:absolute;left:${fishFood[0]*FISH_SIZE}px;top:${fishFood[1]*FISH_SIZE}px;width:${FISH_SIZE}px;height:${FISH_SIZE}px;display:flex;align-items:center;justify-content:center;font-size:16px;z-index:2;'>🦐</div>`;
+        // Draw shark
+        if (shark) {
+          // If sharkOnHead, draw shark on top of fish head
+          const sx = sharkOnHead ? fish[0][0] : shark[0];
+          const sy = sharkOnHead ? fish[0][1] : shark[1];
+          html += `<div style='position:absolute;left:${sx*FISH_SIZE}px;top:${sy*FISH_SIZE}px;width:${FISH_SIZE}px;height:${FISH_SIZE}px;display:flex;align-items:center;justify-content:center;font-size:16px;z-index:5;'>🦈</div>`;
+        }
+        // Draw fish head as blue fish emoji (hide if sharkOnHead)
+        if (!sharkOnHead) {
+          html += `<div style='position:absolute;left:${fish[0][0]*FISH_SIZE}px;top:${fish[0][1]*FISH_SIZE}px;width:${FISH_SIZE}px;height:${FISH_SIZE}px;display:flex;align-items:center;justify-content:center;font-size:16px;z-index:4;'>🐟</div>`;
+        }
+        // Draw fish body (trailing blue dots)
+        for (let i = 1; i < fish.length; i++) {
+          html += `<div style='position:absolute;left:${fish[i][0]*FISH_SIZE}px;top:${fish[i][1]*FISH_SIZE}px;width:${FISH_SIZE}px;height:${FISH_SIZE}px;background:#4fc3f7;border-radius:40%;z-index:2;'></div>`;
+        }
+        html += `<div style='position:absolute;top:8px;left:0;width:100%;text-align:center;font-size:1.2em;color:#388e3c;font-family:Quicksand,Nunito,cursive;z-index:6;'>Food Eaten: ${fishScore}</div>`;
+        html += `</div>`;
+        document.getElementById('fish-game').innerHTML = html;
+        document.getElementById('fish-status').textContent = fishGameOver ? (document.getElementById('fish-status').textContent || `Game Over! Food eaten: ${fishScore}`) : '';
+      }
+
+      function endFishGame(sharkCaught = false) {
+        clearInterval(fishInterval);
+        fishGameOver = true;
+        if (sharkCaught) {
+          document.getElementById('fish-status').textContent = 'Game Over! The shark caught your fish!';
+        } else {
+          document.getElementById('fish-status').textContent = `Game Over! Food eaten: ${fishScore}`;
+        }
+        document.removeEventListener('keydown', fishKeyHandler);
+      }
+
+      function fishKeyHandler(e) {
+        if (fishGameOver) return;
+        if (['ArrowUp','w','W'].includes(e.key) && fishDir[1] !== 1) fishDir = [0, -1];
+        else if (['ArrowDown','s','S'].includes(e.key) && fishDir[1] !== -1) fishDir = [0, 1];
+        else if (['ArrowLeft','a','A'].includes(e.key) && fishDir[0] !== 1) fishDir = [-1, 0];
+        else if (['ArrowRight','d','D'].includes(e.key) && fishDir[0] !== -1) fishDir = [1, 0];
+      }
+    </script>
+  </body>
 </html>
