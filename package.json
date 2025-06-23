@@ -1,0 +1,13 @@
+{
+  "name": "trap-the-bunny",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "scripts": {
+    "start": "npx serve -s public -l 3000",
+    "dev": "npx vite"
+  }
+}

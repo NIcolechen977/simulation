@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trap the Bunny</title>
+  <style>
+    body {
+      font-family: 'Quicksand', 'Nunito', 'Comic Sans MS', cursive, sans-serif;
+      margin: 0;
+      background: linear-gradient(135deg, #d0f5d8 0%, #b8e6c1 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+    }
+    .main-wrapper {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      width: 100vw;
+      position: relative;
+      z-index: 1;
+    }
+    .flower {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5em;
+      margin: 0 18px;
+      user-select: none;
+      pointer-events: none;
+      filter: drop-shadow(0 2px 8px #b8e6c1);
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 0;
+      background: rgba(255,255,255,0.92);
+      border-radius: 22px;
+      box-shadow: 0 4px 32px #b8e6c1;
+      padding: 36px 28px 22px 28px;
+      max-width: 500px;
+      min-width: 340px;
+      position: relative;
+      z-index: 2;
+    }
+    .bunny-ears {
+      position: absolute;
+      top: -38px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 2.5em;
+      z-index: 3;
+      pointer-events: none;
+      user-select: none;
+    }
+    .carrot {
+      position: absolute;
+      bottom: -30px;
+      left: 50%;
+      transform: translateX(-50%) rotate(-10deg);
+      font-size: 2em;
+      z-index: 3;
+      pointer-events: none;
+      user-select: none;
+    }
+    .cloud {
+      position: absolute;
+      font-size: 2.5em;
+      opacity: 0.7;
+      z-index: 0;
+      pointer-events: none;
+      user-select: none;
+      animation: cloud-move 18s linear infinite;
+    }
+    .cloud.left { top: 8%; left: 8%; animation-delay: 0s; }
+    .cloud.right { top: 12%; right: 8%; animation-delay: 6s; }
+    .cloud.center { top: 2%; left: 45%; font-size: 3em; animation-delay: 3s; }
+    @keyframes cloud-move {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(60px); }
+    }
+    .butterfly {
+      position: absolute;
+      font-size: 2em;
+      z-index: 4;
+      pointer-events: none;
+      user-select: none;
+      animation: butterfly-fly 6s ease-in-out infinite alternate;
+    }
+    .butterfly.left { top: 60%; left: 10%; animation-delay: 0s; }
+    .butterfly.right { top: 70%; right: 10%; animation-delay: 2s; }
+    @keyframes butterfly-fly {
+      0% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-30px) scale(1.1); }
+      100% { transform: translateY(0) scale(1); }
+    }
+    h1 {
+      font-family: 'Quicksand', 'Nunito', cursive, sans-serif;
+      font-size: 2.5em;
+      color: #388e3c;
+      letter-spacing: 2px;
+      margin-bottom: 0.2em;
+      text-shadow: 0 2px 8px #b8e6c1;
+    }
+    h2 {
+      color: #5e7c4c;
+      font-family: 'Quicksand', 'Nunito', cursive, sans-serif;
+      margin-top: 0.5em;
+    }
+    ul {
+      color: #4e6e3a;
+      font-size: 1.1em;
+      margin-bottom: 1.2em;
+    }
+    .grid {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 20px;
+      background: rgba(208,245,216,0.5);
+      border-radius: 12px;
+      box-shadow: 0 2px 8px #b8e6c1;
+      padding: 10px 0;
+    }
+    .row {
+      display: flex;
+    }
+    .cell {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #e0f7e9;
+      margin: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s;
+      box-shadow: 0 1px 2px #b8e6c1;
+      border: 2px solid #b8e6c1;
+    }
+    .cell.blocked {
+      background: #a5d6a7;
+      cursor: not-allowed;
+      box-shadow: 0 0 0 2px #7cb342 inset;
+    }
+    .cell.bunny {
+      background: #fffde7;
+      border: 2.5px solid #ffb300;
+      font-size: 26px;
+      box-shadow: 0 0 8px #ffe082;
+      animation: bunny-hop 0.3s;
+    }
+    @keyframes bunny-hop {
+      0% { transform: translateY(0); }
+      30% { transform: translateY(-10px); }
+      60% { transform: translateY(0); }
+    }
+    .status {
+      font-size: 1.3em;
+      margin: 10px 0;
+      color: #d32f2f;
+      font-family: 'Quicksand', 'Nunito', cursive, sans-serif;
+      text-shadow: 0 1px 6px #fffde7;
+    }
+    button, #start-btn {
+      padding: 10px 22px;
+      font-size: 1.1em;
+      border-radius: 10px;
+      border: none;
+      background: #81c784;
+      color: #fff;
+      cursor: pointer;
+      margin-bottom: 10px;
+      margin-top: 10px;
+      font-family: 'Quicksand', 'Nunito', cursive, sans-serif;
+      box-shadow: 0 2px 8px #b8e6c1;
+      transition: background 0.2s;
+    }
+    button:hover, #start-btn:hover {
+      background: #66bb6a;
+    }
+    p {
+      color: #4e6e3a;
+      font-size: 1.1em;
+      margin-top: 0.5em;
+      margin-bottom: 0.5em;
+    }
+    #instructions {
+      background: rgba(255,255,255,0.95);
+      border-radius: 14px;
+      box-shadow: 0 2px 12px #b8e6c1;
+      padding: 18px 18px 10px 18px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="main-wrapper">
+    <div class="flower" aria-hidden="true">
+      🌸<br>🌼<br>🌷<br>🌻
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; position: relative;">
+      <div class="bunny-ears" aria-hidden="true">🐰</div>
+      <div class="container" id="start-container">
+        <h1>Trap the Bunny</h1>
+        <div id="instructions">
+          <h2>How to Play</h2>
+          <ul>
+            <li>The bunny 🐰 starts in the middle of the grid.</li>
+            <li>Click circles to block them and try to trap the bunny.</li>
+            <li>After each block, the bunny moves one step toward the edge.</li>
+            <li>If the bunny escapes to the edge, you lose.</li>
+            <li>If you block all escape routes, you win!</li>
+          </ul>
+          <button id="start-btn">Start Game</button>
+        </div>
+      </div>
+      <div class="container" id="game-container" style="display:none">
+        <h1>Trap the Bunny</h1>
+        <div id="game"></div>
+        <div id="status" class="status"></div>
+        <button id="restart">Restart</button>
+        <p>Click circles to block the bunny. Trap it before it escapes!</p>
+        <div class="carrot" aria-hidden="true">🥕</div>
+      </div>
+    </div>
+    <div class="flower" aria-hidden="true">
+      🌻<br>🌷<br>🌼<br>🌸
+    </div>
+    <div class="cloud left" aria-hidden="true">
+      ☁️
+    </div>
+    <div class="cloud right" aria-hidden="true">
+      ☁️
+    </div>
+    <div class="cloud center" aria-hidden="true">
+      ☁️
+    </div>
+    <div class="butterfly left" aria-hidden="true">
+      🦋
+    </div>
+    <div class="butterfly right" aria-hidden="true">
+      🦋
+    </div>
+  </div>
+  <script>
+    const GRID_SIZE = 9;
+    const CENTER = Math.floor(GRID_SIZE / 2);
+    let blocked = new Set();
+    let bunny = [CENTER, CENTER];
+    let status = "";
+
+    function getNeighbors([x, y]) {
+      return [
+        [x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1],
+        [x - 1, y - 1], [x - 1, y + 1], [x + 1, y - 1], [x + 1, y + 1],
+      ].filter(([nx, ny]) => nx >= 0 && nx < GRID_SIZE && ny >= 0 && ny < GRID_SIZE);
+    }
+    function isEdge([x, y]) {
+      return x === 0 || y === 0 || x === GRID_SIZE - 1 || y === GRID_SIZE - 1;
+    }
+    function bfs(bunny, blocked) {
+      const queue = [[bunny, [bunny]]];
+      const visited = new Set([bunny.toString()]);
+      while (queue.length) {
+        const [pos, path] = queue.shift();
+        if (isEdge(pos)) return path;
+        for (const n of getNeighbors(pos)) {
+          if (!blocked.has(n.toString()) && !visited.has(n.toString())) {
+            visited.add(n.toString());
+            queue.push([n, [...path, n]]);
+          }
+        }
+      }
+      return null;
+    }
+    function render() {
+      const game = document.getElementById('game');
+      game.innerHTML = '';
+      for (let x = 0; x < GRID_SIZE; x++) {
+        const row = document.createElement('div');
+        row.className = 'row';
+        for (let y = 0; y < GRID_SIZE; y++) {
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+          const key = [x, y].toString();
+          if (blocked.has(key)) cell.classList.add('blocked');
+          if (bunny[0] === x && bunny[1] === y) {
+            cell.classList.add('bunny');
+            cell.textContent = '🐰';
+          }
+          cell.addEventListener('click', () => handleCellClick(x, y));
+          row.appendChild(cell);
+        }
+        game.appendChild(row);
+      }
+      document.getElementById('status').textContent = status;
+    }
+    function handleCellClick(x, y) {
+      if (status || (bunny[0] === x && bunny[1] === y)) return;
+      const key = [x, y].toString();
+      if (blocked.has(key)) return;
+      blocked.add(key);
+      const path = bfs(bunny, blocked);
+      if (!path) {
+        status = "You win! The bunny is trapped.";
+        render();
+        return;
+      }
+      if (isEdge(path[1])) {
+        bunny = path[1];
+        status = "You lose! The bunny escaped.";
+        render();
+        return;
+      }
+      bunny = path[1];
+      render();
+    }
+    function resetGame() {
+      blocked = new Set();
+      bunny = [CENTER, CENTER];
+      status = "";
+      render();
+    }
+    function showGame() {
+      document.getElementById('start-container').style.display = 'none';
+      document.getElementById('game-container').style.display = 'flex';
+      resetGame();
+    }
+    document.getElementById('start-btn').onclick = showGame;
+    document.getElementById('restart').onclick = resetGame;
+  </script>
+</body>
+</html>
