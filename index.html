@@ -1,4 +1,4 @@
-when<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -479,6 +479,16 @@ when<!DOCTYPE html>
       }
       document.getElementById('start-btn').onclick = showGame;
       document.getElementById('restart').onclick = resetGame;
+      // Add visual feedback for disabled buttons
+      const allButtons = document.querySelectorAll('button');
+      allButtons.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          if (btn.disabled) {
+            e.preventDefault();
+            return false;
+          }
+        });
+      });
       // Game selection logic
       document.getElementById('choose-bunny').onclick = function() {
         document.getElementById('landing-wrapper').style.display = 'none';
